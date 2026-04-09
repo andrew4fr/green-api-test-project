@@ -4,7 +4,7 @@
 3. Пользователь получает исходный код сервиса (git clone https://github.com/andrew4fr/green-api-test-project.git)
 4. Пользователь выполняет команды
  - docker-compose build
- - docker-compose run
+ - docker-compose up
 
 5. Пользователь открывает в браузере файл index.html и вводит в поля idInstance и ApiTokenInstance значения, указанные в свойствах инстанса
 6. Пользователь последовательно нажимает на кнопки «getSettings»,
