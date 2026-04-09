@@ -1,0 +1,11 @@
+services:
+  green-api-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - GREEN_API_URL=${GREEN_API_URL:-https://3100.api.green-api.com}
+      - SERVER_ADDR=:8080
+    restart: unless-stopped

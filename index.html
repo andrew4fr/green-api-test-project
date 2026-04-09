@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green API test project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #response {
+            width: 100%;
+            height: 300px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            resize: vertical;
+            background-color: #fafafa;
+        }
+
+        .error {
+            color: #d32f2f;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Green API test project</h1>
+
+    <div class="container">
+        <div class="panel">
+            <h2>Параметры</h2>
+            <div class="form-group">
+                <label for="instanceId">IdInstance</label>
+                <input type="text" id="instanceId" placeholder="IdInstance">
+            </div>
+            <div class="form-group">
+                <label for="apiToken">ApiTokenInstance</label>
+                <input type="text" id="apiToken" placeholder="ApiTokenInstance">
+            </div>
+            <button id="getSettingsBtn" onclick="getSettings()">getSettings</button>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+            <button id="getStateInstanceBtn" onclick="getStateInstance()">getStateInstance</button>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="messagePhone">Phone (формат 79991234567@c.us)</label>
+                <input type="text" id="messagePhone" placeholder="Phone">
+            </div>
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message"
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; resize: vertical;"
+                    placeholder="Message"></textarea>
+            </div>
+            <button id="sendMessageBtn" onclick="sendMessage()">sendMessage</button>
+            <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="filePhone">Phone (формат 79991234567@c.us)</label>
+                <input type="text" id="filePhone" placeholder="Phone">
+            </div>
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="urlFile">File URL</label>
+                <input type="text" id="urlFile" placeholder="File URL">
+            </div>
+            <div class="form-group">
+                <label for="fileName">File Name</label>
+                <input type="text" id="fileName" placeholder="File Name">
+            </div>
+            <button id="sendFileBtn" onclick="sendFile()">sendFileByUrl</button>
+            <div id="error" class="error"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Ответ</h2>
+            <textarea id="response" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        async function getSettings() {
+            const instanceId = document.getElementById('instanceId').value;
+            const apiToken = document.getElementById('apiToken').value;
+            const responseField = document.getElementById('response');
+            const errorField = document.getElementById('error');
+            const button = document.getElementById('getSettingsBtn');
+
+            errorField.textContent = '';
+            responseField.value = 'Загрузка...';
+
+            button.disabled = true;
+
+            try {
+                const url = `http://127.0.0.1:8080/api/v1/getSettings?instance_id=${encodeURIComponent(instanceId)}&api_token=${encodeURIComponent(apiToken)}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                errorField.textContent = 'Ошибка: ' + error.message;
+                responseField.value = '';
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function getStateInstance() {
+            const instanceId = document.getElementById('instanceId').value;
+            const apiToken = document.getElementById('apiToken').value;
+            const responseField = document.getElementById('response');
+            const errorField = document.getElementById('error');
+            const button = document.getElementById('getStateInstanceBtn');
+
+            errorField.textContent = '';
+            responseField.value = 'Загрузка...';
+
+            button.disabled = true;
+
+            try {
+                const url = `http://127.0.0.1:8080/api/v1/getStateInstance?instance_id=${encodeURIComponent(instanceId)}&api_token=${encodeURIComponent(apiToken)}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                errorField.textContent = 'Ошибка: ' + error.message;
+                responseField.value = '';
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function sendMessage() {
+            const instanceId = document.getElementById('instanceId').value;
+            const apiToken = document.getElementById('apiToken').value;
+            const phone = document.getElementById('messagePhone').value;
+            const message = document.getElementById('message').value;
+            const responseField = document.getElementById('response');
+            const errorField = document.getElementById('error');
+            const button = document.getElementById('sendMessageBtn');
+
+            errorField.textContent = '';
+            responseField.value = 'Загрузка...';
+
+            button.disabled = true;
+
+            try {
+                const url = `http://127.0.0.1:8080/api/v1/sendMessage?instance_id=${encodeURIComponent(instanceId)}&api_token=${encodeURIComponent(apiToken)}`;
+
+                const body = {
+                    chatId: phone,
+                    message: message
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                errorField.textContent = 'Ошибка: ' + error.message;
+                responseField.value = '';
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function sendFile() {
+            const instanceId = document.getElementById('instanceId').value;
+            const apiToken = document.getElementById('apiToken').value;
+            const phone = document.getElementById('filePhone').value;
+            const urlFile = document.getElementById('urlFile').value;
+            const fileName = document.getElementById('fileName').value;
+            const responseField = document.getElementById('response');
+            const errorField = document.getElementById('error');
+            const button = document.getElementById('sendFileBtn');
+
+            errorField.textContent = '';
+            responseField.value = 'Загрузка...';
+
+            button.disabled = true;
+
+            try {
+                const url = `http://127.0.0.1:8080/api/v1/sendFileByURL?instance_id=${encodeURIComponent(instanceId)}&api_token=${encodeURIComponent(apiToken)}`;
+
+                const body = {
+                    chatId: phone,
+                    urlFile: urlFile,
+                    fileName: fileName
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                errorField.textContent = 'Ошибка: ' + error.message;
+                responseField.value = '';
+            } finally {
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

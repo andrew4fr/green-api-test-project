@@ -1,0 +1,293 @@
+openapi: 3.0.3
+info:
+  title: Green API
+  description: API for handling Green API requests
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8090
+    description: Local
+
+paths:
+  /api/v1/getSettings:
+    get:
+      summary:
+        Get instance settings
+      operationId: GetInstanceSettings
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+        - $ref: '#/components/parameters/ApiToken'
+      responses:
+        '200':
+          description: Instance settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+        '400':
+          description: Bad request - Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/getStateInstance:
+    get:
+      summary:
+        Get instance state
+      operationId: GetInstanceState
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+        - $ref: '#/components/parameters/ApiToken'
+      responses:
+        '200':
+          description: Instance state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StateResponse'
+        '400':
+          description: Bad request - Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Your account is suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/getAccountSettings:
+    get:
+      summary:
+        Get account settings
+      operationId: GetAccountSettings
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+        - $ref: '#/components/parameters/ApiToken'
+      responses:
+        '200':
+          description: Account settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountSettingsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+  /api/v1/sendMessage:
+    post:
+      summary:
+        Send message to the chat
+      operationId: SendMessage
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+        - $ref: '#/components/parameters/ApiToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - chatId
+                - message
+              properties:
+                chatId:
+                  type: string
+                message:
+                  type: string
+      responses:
+        '200':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '400':
+          description: Bad request - Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/sendFileByURL:
+    post:
+      summary:
+        Send file to the chat
+      operationId: SendFile
+      parameters:
+        - $ref: '#/components/parameters/InstanceId'
+        - $ref: '#/components/parameters/ApiToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - chatId
+                - urlFile
+                - fileName
+              properties:
+                chatId:
+                  type: string
+                urlFile:
+                  type: string
+                fileName:
+                  type: string
+                caption:
+                  type: string
+      responses:
+        '200':
+          description: File sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendFileResponse'
+        '400':
+          description: Bad request - Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+    InstanceId:
+      in: query
+      name: instance_id
+      required: true
+      schema:
+        type: string
+    ApiToken:
+      in: query
+      name: api_token
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    YesNo:
+      type: string
+      enum:
+        - "yes"
+        - "no"
+      default: "no"
+    SettingsResponse:
+      type: object
+      properties:
+        wid:
+          type: string
+        typeInstance:
+          type: string
+        webhookUrl:
+          type: string
+        webhookUrlToken:
+          type: string
+        delaySendMessagesMilliseconds:
+          type: integer
+          format: int64
+        markIncomingMessagesReaded:
+          $ref: '#/components/schemas/YesNo'
+        markIncomingMessagesReadedOnReply:
+          $ref: '#/components/schemas/YesNo'
+        outgoingWebhook:
+          $ref: '#/components/schemas/YesNo'
+        outgoingMessageWebhook:
+          $ref: '#/components/schemas/YesNo'
+        outgoingAPIMessageWebhook:
+          $ref: '#/components/schemas/YesNo'
+        stateWebhook:
+          $ref: '#/components/schemas/YesNo'
+        incomingWebhook:
+          $ref: '#/components/schemas/YesNo'
+
+    StateResponse:
+      type: object
+      properties:
+        stateInstance:
+          type: string
+          enum:
+            - "notAuthorized"
+            - "authorized"
+            - "blocked"
+            - "starting"
+            - "suspended"
+            - "pendingPassword"
+
+    AccountSettingsResponse:
+      type: object
+      properties:
+        avatar:
+          type: string
+        phone:
+          type: string
+        chatId:
+          type: string
+
+    SendMessageResponse:
+      type: object
+      properties:
+        idMessage:
+          type: string
+
+    SendFileResponse:
+      type: object
+      properties:
+        idMessage:
+          type: string
+
+    Error:
+      type: object
+      required:
+        - code
+        - details
+      properties:
+        code:
+          type: string
+        details:
+          type: string

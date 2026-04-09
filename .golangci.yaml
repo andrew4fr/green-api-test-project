@@ -1,0 +1,29 @@
+version: "2"
+linters:
+  default: none
+  enable:
+    - revive
+    - govet
+    - unused
+    - ineffassign
+    - gosec
+    - staticcheck
+    - copyloopvar
+  settings:
+    govet:
+      excludes:
+        - fieldalignment
+    revive:
+      rules:
+        - name: comments-density
+          disabled: true
+    gosec:
+      excludes:
+        - G104
+
+
+
+linters-settings:
+  errcheck:
+    exclude:
+      - handlers
