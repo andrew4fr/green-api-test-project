@@ -68,6 +68,19 @@
             border-color: #4CAF50;
         }
 
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
         button {
             width: 100%;
             padding: 12px;
@@ -120,7 +133,7 @@
             </div>
             <div class="form-group">
                 <label for="apiToken">ApiTokenInstance</label>
-                <input type="text" id="apiToken" placeholder="ApiTokenInstance">
+                <input type="password" id="apiToken" placeholder="ApiTokenInstance">
             </div>
             <button id="getSettingsBtn" onclick="getSettings()">getSettings</button>
             <hr style="margin: 15px 0; border: none; border-top: 1px solid #ddd;">
